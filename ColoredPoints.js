@@ -36,7 +36,8 @@ let shapesList = [];
 // Current shape: "POINT", "TRIANGLE", "SQUARE", or "CIRCLE"
 let currentShape = "POINT";
 
-let myPixelArt = []; 
+// We'll load external pixel data here
+let myPixelArt = [];
 
 //------------------------------------------------------
 // MAIN & INITIAL SETUP
@@ -200,23 +201,32 @@ function clearCanvas() {
 //------------------------------------------------------
 // LOADING & RENDERING EXTERNAL PIXEL ART
 //------------------------------------------------------
-
-
-
 function loadPixelArt() {
   fetch("hu_tao_small.json") 
     .then(response => response.json())
     .then(data => {
       myPixelArt = data.pixels;  
-      
       renderPixelArt(data.width, data.height);
+      
+      // << NEW LINES: show reference image after JSON is loaded & squares are drawn
+      const refDiv = document.getElementById("referenceImage");
+      if (refDiv) {
+        // Clear old content if needed
+        refDiv.innerHTML = "";
+        // Create an <img> for "drawing.jpg"
+        let img = document.createElement("img");
+        img.src = "drawing.jpg";  // must be in the same folder
+        img.alt = "Reference drawing";
+        img.style.width = "200px";  // or any size you like
+        refDiv.appendChild(img);
+      }
+      // END NEW LINES
     })
     .catch(error => console.error("Error loading pixel art:", error));
 }
 
 function renderPixelArt(imgWidth, imgHeight) {
   for (let pix of myPixelArt) {
-
     let cellW = 2 / imgWidth;
     let cellH = 2 / imgHeight;
     
@@ -226,14 +236,11 @@ function renderPixelArt(imgWidth, imgHeight) {
     let side = Math.min(cellW, cellH);  
     
     let color = [pix.r, pix.g, pix.b, pix.a];
-
     let sq = new Square(x, y, side, color);
     shapesList.push(sq);
   }
-
   renderAllShapes();
 }
-
 
 //------------------------------------------------------
 // OPTIONAL UI PREVIEW
